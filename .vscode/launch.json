@@ -1,0 +1,49 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Docker Dev: Remote Debug (DAP, volume mode)",
+            "type": "go",
+            "debugAdapter": "dlv-dap",
+            "request": "launch",
+            "port": 2345,
+            "host": "127.0.0.1",
+            "mode": "exec",
+            "program": "/build/new-api",
+            "args": ["--log-dir", "/app/logs"],
+            "showLog": true,
+            "substitutePath": [
+                {
+                    "from": "${workspaceFolder}",
+                    "to": "/workspace"
+                },
+                {
+                    "from": "/snap/go/11127/src",
+                    "to": "/usr/local/go/src"
+                }
+            ]
+        },
+        {
+            "name": "Docker: Remote Debug (DAP, image mode)",
+            "type": "go",
+            "debugAdapter": "dlv-dap",
+            "request": "launch",
+            "port": 2345,
+            "host": "127.0.0.1",
+            "mode": "exec",
+            "program": "/build/new-api",
+            "args": ["--log-dir", "/app/logs"],
+            "showLog": true,
+            "substitutePath": [
+                {
+                    "from": "${workspaceFolder}",
+                    "to": "/build"
+                },
+                {
+                    "from": "/snap/go/11127/src",
+                    "to": "/usr/local/go/src"
+                }
+            ]
+        }
+    ]
+}

@@ -19,19 +19,35 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.debug
+      target: builder-debug
     container_name: new-api
     restart: always
+    entrypoint: []
+    working_dir: /workspace
+    command:
+      - /bin/sh
+      - -lc
+      - |
+        if [ ! -d web/dist ]; then
+          cp -r /build/web/dist /workspace/web/
+        fi
+        /usr/local/go/bin/go build -gcflags="all=-N -l" -o /tmp/new-api .
+        /go/bin/dlv dap --listen=0.0.0.0:2345 --log
     ports:
       - "3000:3000"
-      - "2345:2345"
+      - "2345:2345" # for debugger
     cap_add:
       - SYS_PTRACE
     security_opt:
       - "apparmor:unconfined"
     volumes:
+      - .:/workspace
       - ./data:/data
       - ./logs:/app/logs
+      - go-mod-cache:/go/pkg/mod
+      - go-build-cache:/root/.cache/go-build
     environment:
+      - PATH=/usr/local/go/bin:/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       - SQL_DSN=postgresql://root:123456@postgres:5432/new-api # ⚠️ IMPORTANT: Change the password in production!
 #      - SQL_DSN=root:123456@tcp(mysql:3306)/new-api  # Point to the mysql service, uncomment if using MySQL
       - REDIS_CONN_STRING=redis://:123456@redis:6379 # ⚠️ IMPORTANT: Change the password in production!
@@ -126,6 +142,8 @@ services:
 
 volumes:
   pg_data:
+  go-mod-cache:
+  go-build-cache:
 #  mysql_data:
 
 networks:
