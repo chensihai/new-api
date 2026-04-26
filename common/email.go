@@ -96,7 +96,49 @@ func SendEmail(subject string, receiver string, content string) error {
 			return err
 		}
 	} else {
-		err = smtp.SendMail(addr, auth, SMTPFrom, to, mail)
+		client, dialErr := smtp.Dial(addr)
+		if dialErr != nil {
+			return dialErr
+		}
+		defer client.Close()
+
+		tlsUpgraded := false
+		if ok, _ := client.Extension("STARTTLS"); ok {
+			tlsConfig := &tls.Config{
+				InsecureSkipVerify: true,
+				ServerName:         SMTPServer,
+			}
+			if err = client.StartTLS(tlsConfig); err != nil {
+				return err
+			}
+			tlsUpgraded = true
+		}
+
+		if SMTPToken != "" {
+			if !tlsUpgraded && SMTPServer != "localhost" && SMTPServer != "127.0.0.1" {
+				return fmt.Errorf("SMTP server %s does not support STARTTLS; enable SMTP_SSL or use port 465", SMTPServer)
+			}
+			if err = client.Auth(auth); err != nil {
+				return err
+			}
+		}
+
+		if err = client.Mail(SMTPFrom); err != nil {
+			return err
+		}
+		for _, rcpt := range to {
+			if err = client.Rcpt(rcpt); err != nil {
+				return err
+			}
+		}
+		w, dataErr := client.Data()
+		if dataErr != nil {
+			return dataErr
+		}
+		if _, err = w.Write(mail); err != nil {
+			return err
+		}
+		err = w.Close()
 	}
 	if err != nil {
 		SysError(fmt.Sprintf("failed to send email to %s: %v", receiver, err))
