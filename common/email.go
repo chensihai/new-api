@@ -13,6 +13,7 @@ import (
 func generateMessageID() (string, error) {
 	split := strings.Split(SMTPFrom, "@")
 	if len(split) < 2 {
+		SysError(fmt.Sprintf("SMTP check failed: SMTPFrom is '%s'", SMTPFrom))
 		return "", fmt.Errorf("invalid SMTP account")
 	}
 	domain := strings.Split(SMTPFrom, "@")[1]

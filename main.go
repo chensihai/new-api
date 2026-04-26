@@ -64,6 +64,7 @@ func main() {
 		}
 	}()
 
+
 	if common.RedisEnabled {
 		// for compatibility with old versions
 		common.MemoryCacheEnabled = true

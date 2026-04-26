@@ -16,18 +16,12 @@ version: '3.4' # For compatibility with older Docker versions
 
 services:
   new-api:
-    build:
-      context: .
-      dockerfile: Dockerfile.debug
+    image: calciumion/new-api:latest
     container_name: new-api
     restart: always
+    command: --log-dir /app/logs
     ports:
       - "3000:3000"
-      - "2345:2345"
-    cap_add:
-      - SYS_PTRACE
-    security_opt:
-      - "apparmor:unconfined"
     volumes:
       - ./data:/data
       - ./logs:/app/logs
@@ -45,14 +39,6 @@ services:
 #      - GOOGLE_ANALYTICS_ID=G-XXXXXXXXXX  # Google Analytics 的测量 ID (Google Analytics Measurement ID)
 #      - UMAMI_WEBSITE_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx  # Umami 网站 ID (Umami Website ID)
 #      - UMAMI_SCRIPT_URL=https://analytics.umami.is/script.js  # Umami 脚本 URL，默认为官方地址 (Umami Script URL, defaults to official URL)
-
-  # --- MailHog SMTP Settings ---
-      - SMTP_SERVER=mailhog
-      - SMTP_PORT=1025
-      - SMTP_ACCOUNT=noreply@example.com
-      - SMTP_FROM=noreply@example.com
-      - SMTP_TOKEN=
-      - SMTP_SSL=false
 
     depends_on:
       - redis
@@ -102,27 +88,6 @@ services:
 #      - new-api-network
 #    ports:
 #      - "3306:3306"  # Uncomment if you need to access MySQL from outside Docker
-  dbadmin:
-    image: adminer:latest
-    container_name: dbadmin
-    restart: always
-    ports:
-      - "8080:8080"
-    depends_on:
-      - postgres
-      - redis
-    networks:
-      - new-api-network
-  mailhog:
-    image: mailhog/mailhog
-    container_name: mailhog
-    restart: always
-
-    ports:
-      - "8025:8025"
-      - "1025:1025"
-    networks:
-      - new-api-network
 
 volumes:
   pg_data:

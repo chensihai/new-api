@@ -125,6 +125,15 @@ func InitEnv() {
 	SearchRateLimitEnable = GetEnvOrDefaultBool("SEARCH_RATE_LIMIT_ENABLE", true)
 	SearchRateLimitNum = GetEnvOrDefault("SEARCH_RATE_LIMIT", 10)
 	SearchRateLimitDuration = int64(GetEnvOrDefault("SEARCH_RATE_LIMIT_DURATION", 60))
+
+	// SMTP settings
+	SMTPServer = GetEnvOrDefaultString("SMTP_SERVER", SMTPServer)
+	SMTPPort = GetEnvOrDefault("SMTP_PORT", SMTPPort)
+	SMTPAccount = GetEnvOrDefaultString("SMTP_ACCOUNT", SMTPAccount)
+	SMTPFrom = GetEnvOrDefaultString("SMTP_FROM", SMTPFrom)
+	SMTPToken = GetEnvOrDefaultString("SMTP_TOKEN", SMTPToken)
+	SMTPSSLEnabled = GetEnvOrDefaultBool("SMTP_SSL", SMTPSSLEnabled)
+
 	initConstantEnv()
 }
 
